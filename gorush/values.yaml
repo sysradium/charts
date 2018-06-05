@@ -1,0 +1,20 @@
+replicaCount: 1
+
+image:
+  repository: appleboy/gorush
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8088
+
+android:
+  enable: true
+  android_apikey: ""
+
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

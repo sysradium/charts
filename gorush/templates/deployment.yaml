@@ -1,0 +1,64 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "gorush.fullname" . }}
+  labels:
+    app: {{ template "gorush.name" . }}
+    chart: {{ template "gorush.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "gorush.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "gorush.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8088
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8088
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+          {{- if .Values.android.enable }}
+          - name: GORUSH_ANDROID_ENABLE
+            value: "true"
+          - name: GORUSH_ANDROID_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "gorush.fullname" . }}
+                key: android_apikey
+          {{- end }}
+          - name: GORUSH_STAT_ENGINE
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "gorush.fullname" . }}
+                key: stat.engine
+
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
