@@ -11,8 +11,13 @@ service:
   targetPort: 8088
 
 android:
-  enable: true
-  android_apikey: ""
+  enable: false
+  apikey: ""
+
+ios:
+  enable: false
+  base64: ""
+  key_type: ""
 
 resources: {}
 nodeSelector: {}

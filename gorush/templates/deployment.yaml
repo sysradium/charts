@@ -34,13 +34,26 @@ spec:
             periodSeconds: 3
           env:
           {{- if .Values.android.enable }}
-          - name: GORUSH_ANDROID_ENABLE
+          - name: GORUSH_ANDROID_ENABLED
             value: "true"
-          - name: GORUSH_ANDROID_API_KEY
+          - name: GORUSH_ANDROID_APIKEY
             valueFrom:
               secretKeyRef:
                 name: {{ template "gorush.fullname" . }}
                 key: android_apikey
+          {{- end }}
+          {{- if .Values.ios.enable }}
+          - name: GORUSH_IOS_ENABLED
+            value: "true"
+          - name: GORUSH_IOS_KEY_PATH
+            value: ""
+          - name: GORUSH_IOS_KEY_BASE64
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "gorush.fullname" . }}
+                key: ios_base64
+          - name: GORUSH_IOS_KEY_TYPE
+            value: {{ .Values.ios.key_type }}
           {{- end }}
           - name: GORUSH_STAT_ENGINE
             valueFrom:
